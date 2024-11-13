@@ -1,15 +1,22 @@
 import React from "react";
-import Sidebar from "./components/Sidebar/Sidebar";
-import Main from "./components/Main/Main";
-import Login from "./components/Login/Login";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./components/Home/Home";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 const App = () => {
   return (
-    <>
-      <Login />
-      <Sidebar />
-      <Main />
-    </>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 };
 
