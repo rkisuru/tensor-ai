@@ -35,17 +35,40 @@ const ContextProvider = (props) => {
       response = await run(input);
     }
 
-    let responseArray = response.split("**");
+    // Step 1: Replace ## with <b> and </b>
+    let responseWithBoldHeaders = response
+      .split("##")
+      .join("<b>")
+      .split(":</b>")
+      .join(":</b></br>");
+
+    // Step 2: Replace ** with <b> and </b>
+    let responseArray = responseWithBoldHeaders.split("**");
     let newResponse = "";
     for (let i = 0; i < responseArray.length; i++) {
-      if (i === 0 || i % 2 !== 1) {
-        newResponse += responseArray[i];
-      } else {
+      if (i % 2 === 1) {
         newResponse += "<b>" + responseArray[i] + "</b>";
+      } else {
+        newResponse += responseArray[i];
       }
     }
-    let newResponse2 = newResponse.split("*").join("</br>");
-    let newResponseArray = newResponse2.split(" ");
+
+    // Step 3: Replace * with <li> and wrap with <ul> tags if there are list items
+    let listSegments = newResponse.split("* **");
+    let newResponseWithList = listSegments[0]; // The text before the first list item remains as is
+    if (listSegments.length > 1) {
+      newResponseWithList += "<ul>"; // Start the unordered list
+      for (let i = 1; i < listSegments.length; i++) {
+        newResponseWithList += "<li>" + listSegments[i].trim() + "</li>";
+      }
+      newResponseWithList += "</ul>"; // Close the unordered list
+    }
+
+    // Step 4: Handle line spaces by preserving line breaks (assuming \n represents line breaks)
+    let formattedResponse = newResponseWithList.replace(/\n/g, "</br>");
+
+    // Step 5: Display the formatted response with delays as before
+    let newResponseArray = formattedResponse.split(" ");
     for (let i = 0; i < newResponseArray.length; i++) {
       const nextWord = newResponseArray[i];
       delayPara(i, nextWord + " ");
